@@ -1,0 +1,8 @@
+# Cursor ignore patterns
+# .env files should be visible in Cursor even if they're in .gitignore
+
+node_modules/
+dist/
+*.log
+.DS_Store
+
