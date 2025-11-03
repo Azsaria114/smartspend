@@ -8,6 +8,10 @@ import Sidebar from '../components/Sidebar';
 import ExpenseFilters from '../components/ExpenseFilters';
 import Modal from '../components/Modal';
 import FloatingActionButton from '../components/FloatingActionButton';
+import CategoryCards from '../components/CategoryCards';
+import GuidedTour from '../components/GuidedTour';
+import NotificationCenter from '../components/NotificationCenter';
+import { useNotifications } from '../hooks/useNotifications';
 import { Link } from 'react-router-dom';
 
 const STORAGE_KEY = 'smartBudget.settings.v1';
@@ -37,6 +41,9 @@ export default function Dashboard() {
 
   const budget = loadBudget();
   const monthlyIncome = budget?.monthlyIncome || 0;
+
+  // Notifications
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications(expenses, monthlyIncome);
 
   // Expose handlers globally for sidebar
   useEffect(() => {
@@ -211,7 +218,14 @@ export default function Dashboard() {
               </div>
               
               <div className="flex items-center gap-3">
+                <NotificationCenter
+                  notifications={notifications}
+                  unreadCount={unreadCount}
+                  onMarkAsRead={markAsRead}
+                  onMarkAllAsRead={markAllAsRead}
+                />
                 <button
+                  id="add-expense"
                   onClick={() => {
                     setEditingExpense(null);
                     setShowFormModal(true);
@@ -242,7 +256,7 @@ export default function Dashboard() {
           </div>
 
           {/* Main Balance Card - Single Source of Truth */}
-          <div className="mb-6">
+          <div className="mb-6" id="balance">
             {monthlyIncome > 0 ? (
               <div className="bg-gradient-to-br from-teal-600 via-teal-500 to-teal-700 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
@@ -304,10 +318,17 @@ export default function Dashboard() {
             )}
           </div>
 
+          {/* Category Cards */}
+          {thisMonthExpenses.length > 0 && (
+            <div className="mb-6" id="category-cards">
+              <CategoryCards expenses={thisMonthExpenses} monthlyTotal={thisMonthTotal} />
+            </div>
+          )}
+
           {/* Main Grid - Each Section Has Unique Purpose */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             {/* Spending Analytics - Charts Only */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2" id="analytics">
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">Spending Analytics</h3>
@@ -484,6 +505,9 @@ export default function Dashboard() {
           )}
         </main>
       </div>
+
+      {/* Guided Tour */}
+      <GuidedTour />
 
       {/* Floating Action Button */}
       <FloatingActionButton onClick={() => {

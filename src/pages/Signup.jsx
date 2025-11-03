@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useExpenses } from '../hooks/useExpenses';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -9,8 +10,51 @@ export default function Signup() {
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signup } = useAuth();
+  const { signup, currentUser } = useAuth();
+  const { addExpense } = useExpenses(currentUser?.uid);
   const navigate = useNavigate();
+
+  // Load saved profile data on mount
+  useEffect(() => {
+    const savedProfile = localStorage.getItem('smartspend.profile');
+    if (savedProfile) {
+      const profile = JSON.parse(savedProfile);
+      if (profile.displayName) {
+        setDisplayName(profile.displayName);
+      }
+    }
+  }, []);
+
+  // Import pending expenses after user is authenticated
+  useEffect(() => {
+    if (currentUser) {
+      importPendingExpenses();
+    }
+  }, [currentUser]);
+
+  async function importPendingExpenses() {
+    try {
+      // Import sample expenses
+      const sampleExpenses = JSON.parse(localStorage.getItem('smartspend.sampleExpenses') || '[]');
+      if (sampleExpenses.length > 0 && currentUser) {
+        for (const expense of sampleExpenses) {
+          await addExpense(expense);
+        }
+        localStorage.removeItem('smartspend.sampleExpenses');
+      }
+
+      // Import CSV expenses
+      const csvExpenses = JSON.parse(localStorage.getItem('smartspend.csvExpenses') || '[]');
+      if (csvExpenses.length > 0 && currentUser) {
+        for (const expense of csvExpenses) {
+          await addExpense(expense);
+        }
+        localStorage.removeItem('smartspend.csvExpenses');
+      }
+    } catch (error) {
+      console.error('Error importing pending expenses:', error);
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -26,7 +70,14 @@ export default function Signup() {
     try {
       setError('');
       setLoading(true);
-      await signup(email, password, displayName);
+      
+      // Get saved profile for display name if not provided
+      const savedProfile = localStorage.getItem('smartspend.profile');
+      const finalDisplayName = displayName || (savedProfile ? JSON.parse(savedProfile).displayName : '');
+      
+      await signup(email, password, finalDisplayName);
+      
+      // Import pending expenses will be handled by useEffect when currentUser is set
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Failed to create an account');

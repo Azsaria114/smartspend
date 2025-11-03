@@ -5,12 +5,14 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Insights from './pages/Insights';
+import Onboarding from './pages/Onboarding';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
         <Routes>
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route
@@ -29,7 +31,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/onboarding" replace />} />
         </Routes>
       </AuthProvider>
     </Router>
