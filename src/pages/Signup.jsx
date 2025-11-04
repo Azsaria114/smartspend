@@ -16,16 +16,9 @@ export default function Signup() {
   const { addExpense } = useExpenses(currentUser?.uid);
   const navigate = useNavigate();
 
-  // Load saved profile data on mount
-  useEffect(() => {
-    const savedProfile = localStorage.getItem('smartspend.profile');
-    if (savedProfile) {
-      const profile = JSON.parse(savedProfile);
-      if (profile.displayName) {
-        setDisplayName(profile.displayName);
-      }
-    }
-  }, []);
+  // Don't auto-load saved profile data - let users enter their own name
+  // Only use saved profile if user is coming from onboarding flow
+  // For fresh signup, start with empty form
 
   const importPendingExpenses = useCallback(async () => {
     try {
@@ -73,25 +66,15 @@ export default function Signup() {
       setError('');
       setLoading(true);
       
-      // Get saved profile for display name if not provided
-      const savedProfile = localStorage.getItem('smartspend.profile');
-      const finalDisplayName = displayName || (savedProfile ? JSON.parse(savedProfile).displayName : '');
+      // Use the display name entered by the user (or empty if not provided)
+      await signup(email, password, displayName || '');
       
-      await signup(email, password, finalDisplayName);
+      // Mark onboarding as completed (skip old onboarding flow)
+      localStorage.setItem('smartspend.onboarding.completed', 'true');
       
-      // Mark that user has just signed up (for onboarding redirect)
-      localStorage.setItem('smartspend.justSignedUp', 'true');
-      localStorage.setItem('smartspend.hasExpenses', 'false');
-      
-      // Small delay to ensure auth state is updated
+      // Small delay to ensure auth state is updated, then go directly to dashboard
       setTimeout(() => {
-        // Check if onboarding should be shown
-        const hasOnboarding = localStorage.getItem('smartspend.onboarding.completed') !== 'true';
-        if (hasOnboarding) {
-          navigate('/onboarding', { replace: true });
-        } else {
-          navigate('/dashboard');
-        }
+        navigate('/dashboard', { replace: true });
       }, 200);
     } catch (err) {
       console.error('Signup error:', err);

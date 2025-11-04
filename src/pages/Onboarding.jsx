@@ -11,18 +11,22 @@ export default function Onboarding() {
   const { currentUser } = useAuth();
 
   useEffect(() => {
-    // Check if onboarding is already completed
-    const completed = localStorage.getItem('smartspend.onboarding.completed');
-    const savedProfile = localStorage.getItem('smartspend.profile');
+    // If user is authenticated and onboarding is completed, redirect to dashboard
+    if (currentUser) {
+      const completed = localStorage.getItem('smartspend.onboarding.completed');
+      if (completed === 'true') {
+        navigate('/dashboard', { replace: true });
+        return;
+      }
+    }
     
-    if (completed === 'true' && savedProfile) {
-      // Skip onboarding if already completed
-      navigate('/dashboard', { replace: true });
-    } else if (savedProfile && !completed) {
-      // Resume from where they left off
+    // If user has saved profile but not completed, resume from import step
+    const savedProfile = localStorage.getItem('smartspend.profile');
+    const completed = localStorage.getItem('smartspend.onboarding.completed');
+    if (savedProfile && completed !== 'true') {
       setStep(3); // Go to import data step
     }
-  }, [navigate]);
+  }, [navigate, currentUser]);
 
   const handleWelcomeNext = () => {
     setStep(2);

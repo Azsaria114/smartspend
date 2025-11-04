@@ -31,25 +31,9 @@ export default function ProtectedRoute({ children }) {
     return <Navigate to="/" replace />;
   }
 
-  // Check onboarding completion - be more lenient for better UX
-  const onboardingCompleted = localStorage.getItem('smartspend.onboarding.completed');
-  const hasExpenses = localStorage.getItem('smartspend.hasExpenses') === 'true';
-  
-  // Only redirect to onboarding if:
-  // 1. Onboarding not completed AND
-  // 2. User has no expenses (likely new user)
-  // Existing users with data can skip onboarding
-  if ((!onboardingCompleted || onboardingCompleted !== 'true') && !hasExpenses) {
-    // Check if user just signed up (has the flag we set)
-    const justSignedUp = localStorage.getItem('smartspend.justSignedUp') === 'true';
-    if (justSignedUp) {
-      // Clear the flag
-      localStorage.removeItem('smartspend.justSignedUp');
-      return <Navigate to="/onboarding" replace />;
-    }
-    // For existing users trying to access, allow them through
-    // They can complete onboarding later if needed
-  }
+  // Allow all authenticated users to access protected routes
+  // Onboarding is now optional and can be accessed later if needed
+  // No forced redirects - users go directly to dashboard after signup
 
   return children;
 }
