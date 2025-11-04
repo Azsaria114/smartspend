@@ -14,14 +14,25 @@ import GuidedTour from '../components/GuidedTour';
 import { useNotifications } from '../hooks/useNotifications';
 import Header from '../components/Header';
 
-const STORAGE_KEY = 'smartBudget.settings.v1';
-function loadBudget() {
+function getStorageKey(userId) {
+  return userId ? `smartBudget.settings.v1.${userId}` : 'smartBudget.settings.v1';
+}
+
+function loadBudget(userId) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const key = getStorageKey(userId);
+    const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
+}
+
+function saveBudget(budget, userId) {
+  try {
+    const key = getStorageKey(userId);
+    localStorage.setItem(key, JSON.stringify(budget));
+  } catch {}
 }
 
 export default function Dashboard() {
@@ -32,6 +43,8 @@ export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [showAllExpenses, setShowAllExpenses] = useState(false);
+  const [showIncomeModal, setShowIncomeModal] = useState(false);
+  const [incomeInput, setIncomeInput] = useState('');
 
   useEffect(() => {
     if (expenses && expenses.length >= 0) {
@@ -39,11 +52,36 @@ export default function Dashboard() {
     }
   }, [expenses]);
 
-  const budget = loadBudget();
+  const [budget, setBudget] = useState(() => loadBudget(currentUser?.uid));
   const monthlyIncome = budget?.monthlyIncome || 0;
+  
+  // Reload budget when user changes
+  useEffect(() => {
+    setBudget(loadBudget(currentUser?.uid));
+  }, [currentUser?.uid]);
+
+  // Initialize income input when modal opens
+  useEffect(() => {
+    if (showIncomeModal) {
+      setIncomeInput(budget?.monthlyIncome?.toString() || '');
+    }
+  }, [showIncomeModal, budget]);
+
+  // Save income handler
+  const handleSaveIncome = () => {
+    const incomeValue = Number(incomeInput) || 0;
+    const updatedBudget = {
+      ...budget,
+      monthlyIncome: incomeValue,
+      allocations: budget?.allocations || {}
+    };
+    saveBudget(updatedBudget, currentUser?.uid);
+    setBudget(updatedBudget); // Update state immediately
+    setShowIncomeModal(false);
+  };
 
   // Notifications
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications(expenses, monthlyIncome);
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications(expenses, monthlyIncome, budget);
 
   // Expose handlers globally for sidebar
   useEffect(() => {
@@ -264,7 +302,18 @@ export default function Dashboard() {
                       <h2 className="text-3xl font-bold text-white">₹{availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-purple-300 mb-1">Monthly Income</p>
+                      <div className="flex items-center gap-2 justify-end mb-1">
+                        <p className="text-sm font-medium text-purple-300">Monthly Income</p>
+                        <button
+                          onClick={() => setShowIncomeModal(true)}
+                          className="p-1 text-purple-300 hover:text-purple-200 hover:bg-purple-500/20 rounded transition-colors"
+                          title="Edit Income"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                      </div>
                       <p className="text-xl font-semibold text-white">₹{monthlyIncome.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                   </div>
@@ -294,24 +343,24 @@ export default function Dashboard() {
                     )}
                   </div>
                 </div>
-              ) : (
-                <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-lg border border-blue-500/30 p-5 shadow-lg">
-                  <div>
-                    <p className="text-sm font-medium text-blue-300 mb-1">Total Expenses</p>
-                    <h2 className="text-3xl font-bold text-white mb-2">₹{thisMonthTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                    <p className="text-sm text-gray-400 mb-4">{thisMonthExpenses.length} transactions this month</p>
-                <Link
-                  to="/insights"
-                      className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg"
-                >
-                      Set up budget
-                      <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                </Link>
-              </div>
-            </div>
-              )}
+                ) : (
+                  <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-lg border border-blue-500/30 p-5 shadow-lg">
+                    <div>
+                      <p className="text-sm font-medium text-blue-300 mb-1">Total Expenses</p>
+                      <h2 className="text-3xl font-bold text-white mb-2">₹{thisMonthTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                      <p className="text-sm text-gray-400 mb-4">{thisMonthExpenses.length} transactions this month</p>
+                      <button
+                        onClick={() => setShowIncomeModal(true)}
+                        className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg"
+                      >
+                        <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        Set Monthly Income
+                      </button>
+                    </div>
+                  </div>
+                )}
             </div>
 
           {/* Category Cards */}
@@ -538,19 +587,61 @@ export default function Dashboard() {
         setShowFormModal(true);
       }} />
 
-      {/* Expense Form Modal */}
-      <Modal
-        isOpen={showFormModal}
-        onClose={handleCancel}
-        title={editingExpense ? 'Edit Expense' : 'Add New Expense'}
-      >
-            <ExpenseForm
-              expense={editingExpense}
-              onSubmit={handleSubmit}
-              onCancel={handleCancel}
-            />
-      </Modal>
-    </div>
-  );
-}
+        {/* Expense Form Modal */}
+        <Modal
+          isOpen={showFormModal}
+          onClose={handleCancel}
+          title={editingExpense ? 'Edit Expense' : 'Add New Expense'}
+        >
+          <ExpenseForm
+            expense={editingExpense}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+          />
+        </Modal>
+
+        {/* Income Setting Modal */}
+        <Modal
+          isOpen={showIncomeModal}
+          onClose={() => setShowIncomeModal(false)}
+          title="Set Monthly Income"
+        >
+          <div className="p-6">
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-200 mb-2">
+                Monthly Income (₹)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={incomeInput}
+                onChange={(e) => setIncomeInput(e.target.value)}
+                placeholder="e.g., 50000"
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-base text-white placeholder-gray-400"
+                autoFocus
+              />
+              <p className="text-xs text-gray-400 mt-2">
+                Enter your monthly income to track your available balance and budget progress.
+              </p>
+            </div>
+            
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowIncomeModal(false)}
+                className="px-4 py-2 bg-gray-700 text-gray-300 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors border border-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveIncome}
+                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg"
+              >
+                Save Income
+              </button>
+            </div>
+          </div>
+        </Modal>
+      </div>
+    );
+  }
 

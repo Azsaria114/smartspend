@@ -1,17 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const STORAGE_KEY = 'smartBudget.settings.v1';
-
-function loadBudget() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-export function useNotifications(expenses, monthlyIncome) {
+export function useNotifications(expenses, monthlyIncome, budget = null) {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -23,7 +12,6 @@ export function useNotifications(expenses, monthlyIncome) {
       return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     });
     const thisMonthTotal = thisMonth.reduce((sum, e) => sum + e.amount, 0);
-    const budget = loadBudget();
 
     // Budget alerts
     if (budget && monthlyIncome > 0) {
@@ -97,7 +85,7 @@ export function useNotifications(expenses, monthlyIncome) {
 
     setNotifications(newNotifications);
     setUnreadCount(newNotifications.filter(n => !n.read).length);
-  }, [expenses, monthlyIncome]);
+  }, [expenses, monthlyIncome, budget]);
 
   const markAsRead = (id) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));

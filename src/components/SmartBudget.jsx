@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const DEFAULT_CATEGORIES = [
   'Food',
@@ -10,11 +11,14 @@ const DEFAULT_CATEGORIES = [
   'Other',
 ];
 
-const STORAGE_KEY = 'smartBudget.settings.v1';
+function getStorageKey(userId) {
+  return userId ? `smartBudget.settings.v1.${userId}` : 'smartBudget.settings.v1';
+}
 
-function loadSettings() {
+function loadSettings(userId) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const key = getStorageKey(userId);
+    const raw = localStorage.getItem(key);
     if (!raw) return null;
     return JSON.parse(raw);
   } catch {
@@ -22,14 +26,17 @@ function loadSettings() {
   }
 }
 
-function saveSettings(settings) {
+function saveSettings(settings, userId) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    const key = getStorageKey(userId);
+    localStorage.setItem(key, JSON.stringify(settings));
   } catch {}
 }
 
 export default function SmartBudget({ expenses }) {
-  const existing = loadSettings();
+  const { currentUser } = useAuth();
+  const userId = currentUser?.uid;
+  const existing = loadSettings(userId);
   const [monthlyIncome, setMonthlyIncome] = useState(existing?.monthlyIncome || '');
   const [allocations, setAllocations] = useState(() => {
     const base = existing?.allocations;
@@ -82,8 +89,10 @@ export default function SmartBudget({ expenses }) {
   const monthlyIncomeNumber = Number(monthlyIncome) || 0;
 
   useEffect(() => {
-    saveSettings({ monthlyIncome: monthlyIncomeNumber, allocations });
-  }, [monthlyIncomeNumber, allocations]);
+    if (userId) {
+      saveSettings({ monthlyIncome: monthlyIncomeNumber, allocations }, userId);
+    }
+  }, [monthlyIncomeNumber, allocations, userId]);
 
   const handleAllocChange = (cat, value) => {
     const num = Math.max(0, Math.min(100, Number(value)));
