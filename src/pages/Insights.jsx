@@ -282,54 +282,67 @@ export default function Insights() {
                     </button>
                   </div>
 
-                  {/* AI Advice - Beautiful Design */}
+                  {/* AI Advice - Story Format Design */}
                   <div className="lg:col-span-2">
-                    <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden shadow-lg">
-                      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="bg-gray-800 rounded-lg border border-gray-700 shadow-lg overflow-hidden">
+                      {/* Compact Header */}
+                      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-4 border-b border-indigo-500/20">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                             </svg>
                           </div>
                           <div>
-                            <h3 className="text-xl font-bold text-white">AI Financial Advisor</h3>
-                            <p className="text-indigo-100 text-sm mt-0.5">Personalized insights tailored to your spending</p>
+                            <h3 className="text-lg font-bold text-white">Your Financial Story</h3>
+                            <p className="text-indigo-100 text-xs mt-0.5">Personalized insights & recommendations</p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="p-6 bg-gray-800">
+                      {/* Story Content */}
+                      <div className="p-5 bg-gray-800">
                         {loading ? (
-                          <div className="space-y-4 animate-pulse">
-                            <div className="h-4 bg-gray-700 rounded w-full"></div>
-                            <div className="h-4 bg-gray-700 rounded w-5/6"></div>
-                            <div className="h-4 bg-gray-700 rounded w-4/6"></div>
-                            <div className="h-4 bg-gray-700 rounded w-3/4 mt-6"></div>
-                            <div className="h-4 bg-gray-700 rounded w-full"></div>
+                          <div className="space-y-3">
+                            <div className="h-3 bg-gray-700 rounded w-full animate-pulse"></div>
+                            <div className="h-3 bg-gray-700 rounded w-5/6 animate-pulse"></div>
+                            <div className="h-3 bg-gray-700 rounded w-4/6 animate-pulse"></div>
+                            <div className="h-3 bg-gray-700 rounded w-full mt-4 animate-pulse"></div>
                           </div>
                         ) : error ? (
-                          <div className="bg-red-900/30 border border-red-500/50 text-red-300 px-5 py-4 rounded-lg">
+                          <div className="bg-red-900/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                               <span className="font-semibold text-sm">Error</span>
                             </div>
-                            <p className="text-sm">{error}</p>
+                            <p className="text-xs text-red-200">{error}</p>
+                            <button
+                              onClick={fetchAdvice}
+                              className="mt-3 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs font-medium transition-colors"
+                            >
+                              Try Again
+                            </button>
                           </div>
                         ) : advice ? (
-                          <div className="max-w-none">
-                            <FormattedAdvice advice={advice} />
+                          <div className="relative">
+                            {/* Story Timeline */}
+                            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-500 via-purple-500 to-transparent"></div>
+                            
+                            <div className="pl-6 space-y-4">
+                              <FormattedAdvice advice={advice} />
+                            </div>
                           </div>
                         ) : (
                           <div className="text-center py-12">
-                            <div className="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center mx-auto mb-4">
-                              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-4 border border-indigo-500/30">
+                              <svg className="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                               </svg>
                             </div>
-                            <p className="text-gray-400 text-sm">Click "Refresh Insights" to generate personalized advice</p>
+                            <h4 className="text-base font-semibold text-white mb-1">Ready for Insights?</h4>
+                            <p className="text-gray-400 text-xs">Click "Refresh Insights" to get your personalized financial story</p>
                           </div>
                         )}
                       </div>

@@ -165,9 +165,6 @@ export async function getFinancialAdvice(expenses) {
       .map(([cat, amt]) => `${cat}: ₹${amt.toFixed(2)}`)
       .join(', ');
 
-    const topCategory = Object.entries(categoryTotals)
-      .sort(([, a], [, b]) => b - a)[0]?.[0] || 'N/A';
-
     const avgTransaction = expenses.length > 0 ? totalSpent / expenses.length : 0;
     
     // Get date range
@@ -176,23 +173,23 @@ export async function getFinancialAdvice(expenses) {
     const newestDate = new Date(Math.max(...dates));
     const daysDiff = Math.ceil((newestDate - oldestDate) / (1000 * 60 * 60 * 24)) || 1;
 
-    const prompt = `You are an expert personal finance advisor. Analyze this spending data and provide clear, actionable financial advice.
+    const prompt = `You are a friendly personal finance advisor telling a story about someone's spending. Write your advice like you're having a conversation with them, making it easy to understand.
 
-**Spending Summary:**
-- Total Amount: ₹${totalSpent.toFixed(2)}
+**Their Spending Story:**
+- Total Amount Spent: ₹${totalSpent.toFixed(2)}
 - Number of Transactions: ${expenses.length}
 - Average Transaction: ₹${avgTransaction.toFixed(2)}
 - Time Period: ${daysDiff} day(s)
 - Top Spending Categories: ${categoryBreakdown}
 
 **Your Task:**
-Provide personalized financial advice in a friendly, professional tone. Include:
-1. A brief analysis of spending patterns (2-3 sentences)
-2. Top 3 specific savings recommendations based on their spending
-3. Practical tips to reduce expenses
-4. A realistic monthly budget suggestion based on their current spending
+Write a personalized financial story that:
+1. Starts with a friendly observation about their spending (like "Looking at your expenses, I notice...")
+2. Tells them what's working well and what could be improved (in simple, conversational language)
+3. Gives 2-3 specific, actionable recommendations (like "Here's what I suggest...")
+4. Ends with an encouraging note about their financial future
 
-Format your response clearly with sections. Be encouraging but realistic. Keep it concise (250-350 words). Use emojis sparingly for visual appeal.`;
+Write it as if you're talking directly to them - use "you" and "your". Make it feel like a story they can follow easily. Keep paragraphs short (2-3 sentences max). Use simple language. Keep it under 300 words total.`;
 
     // Use the latest Gemini API endpoint
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -248,31 +245,23 @@ function generateMockAdvice(expenses) {
     .sort(([, a], [, b]) => b - a)[0];
 
   return `
-### 📊 Spending Analysis
+Looking at your spending, I can see you've made ${expenses.length} transactions totaling ₹${totalSpent.toFixed(2)}. Your biggest expense category is ${topCategory ? topCategory[0] : 'various categories'} where you spent ₹${topCategory ? topCategory[1].toFixed(2) : '0.00'}.
 
-You've recorded ${expenses.length} transactions totaling **₹${totalSpent.toFixed(2)}**.
+Here's what I notice: Your average transaction is ₹${avgDaily.toFixed(2)}, which gives us a good starting point.
 
-**Top Spending Category:** ${topCategory ? `${topCategory[0]} (₹${topCategory[1].toFixed(2)})` : 'N/A'}
+**What I suggest:**
 
-**Average Transaction:** ₹${avgDaily.toFixed(2)}
+1. Focus on ${topCategory ? topCategory[0] : 'your top spending area'} - this is where you're spending the most. Try setting a monthly limit that's 10% lower than what you're spending now. Small adjustments here can make a big difference.
 
-### 💡 Recommendations
+2. The power of small changes - If you save just ₹50 each day by cutting one small unnecessary expense, you'll have ₹${(50 * 30).toFixed(2)} extra at the end of the month. That's money you can put toward something important to you.
 
-1. **Track Your Habits**: Your highest spending is in ${topCategory ? topCategory[0] : 'various categories'}. Consider setting a monthly budget for this category.
+3. Keep tracking - You're already doing great by recording your expenses! The more data you have, the better insights you'll get. Try to be consistent and add expenses daily.
 
-2. **Small Changes, Big Impact**: If you reduce daily small expenses by just ₹50, you could save approximately **₹${(50 * 30).toFixed(2)} per month**.
+**Your financial journey:**
 
-3. **Create Categories**: Continue categorizing expenses to identify patterns and opportunities for savings.
+Every small step counts. You're building awareness of your spending, which is the first step toward better financial control. Keep going, and you'll see your savings grow over time.
 
-4. **Set Goals**: Consider setting a monthly savings goal of 20% of your income.
-
-### 🎯 Next Steps
-
-- Review your ${topCategory ? topCategory[0] : 'spending'} expenses for the past week
-- Look for recurring subscriptions or memberships you might not need
-- Try the "24-hour rule" for non-essential purchases
-
-*Note: This is mock advice. Connect your Gemini API key in the environment variables for personalized AI-powered insights!*
+*Note: This is sample advice. Add your Gemini API key for personalized AI insights!*
   `.trim();
 }
 

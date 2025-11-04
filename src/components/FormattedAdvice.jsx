@@ -75,13 +75,15 @@ export default function FormattedAdvice({ advice }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {formattedContent.map((section, index) => {
         if (section.type === 'heading') {
           return (
-            <div key={index} className="mt-8 first:mt-0">
-              <h4 className={`font-bold text-white mb-4 ${
-                section.level === 2 ? 'text-2xl' : 'text-xl'
+            <div key={index} className="mt-4 first:mt-0 relative">
+              {/* Timeline dot */}
+              <div className="absolute -left-[26px] top-1 w-3 h-3 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full border-2 border-gray-800 shadow-lg"></div>
+              <h4 className={`font-semibold text-white mb-1.5 ${
+                section.level === 2 ? 'text-base' : 'text-sm'
               }`}>
                 {section.content}
               </h4>
@@ -91,21 +93,23 @@ export default function FormattedAdvice({ advice }) {
 
         if (section.type === 'list') {
           return (
-            <ul key={index} className="space-y-3 ml-2">
+            <div key={index} className="space-y-2 ml-1">
               {section.content.map((item, itemIndex) => (
-                <li key={itemIndex} className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-gray-300 leading-relaxed text-base">{item}</span>
-                </li>
+                <div key={itemIndex} className="flex items-start gap-2.5">
+                  <div className="mt-1.5 flex-shrink-0">
+                    <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
+                  </div>
+                  <p className="text-gray-300 leading-relaxed text-sm flex-1">{item}</p>
+                </div>
               ))}
-            </ul>
+            </div>
           );
         }
 
         return (
-          <div key={index} className="space-y-3">
+          <div key={index} className="space-y-2">
             {section.content.map((para, paraIndex) => (
-              <p key={paraIndex} className="text-gray-300 leading-relaxed text-base">
+              <p key={paraIndex} className="text-gray-300 leading-relaxed text-sm">
                 {para}
               </p>
             ))}
