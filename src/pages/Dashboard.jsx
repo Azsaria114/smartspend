@@ -10,7 +10,6 @@ import Sidebar from '../components/Sidebar';
 import Modal from '../components/Modal';
 import FloatingActionButton from '../components/FloatingActionButton';
 import CategoryCards from '../components/CategoryCards';
-import GuidedTour from '../components/GuidedTour';
 import { useNotifications } from '../hooks/useNotifications';
 import Header from '../components/Header';
 
@@ -577,9 +576,6 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
-
-      {/* Guided Tour */}
-      <GuidedTour />
 
       {/* Floating Action Button */}
       <FloatingActionButton onClick={() => {
