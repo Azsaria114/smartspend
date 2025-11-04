@@ -7,18 +7,19 @@ Add these environment variables in your Vercel project settings:
 ### Firebase Configuration
 
 ```
-VITE_FIREBASE_API_KEY=AIzaSyD7oCv1WJ6depZFxIHuSQqeAiBfoDAWG2
+VITE_FIREBASE_API_KEY=AIzaSyD7oCvK1WJ6depZFxIHuSQqeAiBfoDAWG8
 VITE_FIREBASE_AUTH_DOMAIN=smartspend-c8e7c.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=smartspend-c8e7c
-VITE_FIREBASE_STORAGE_BUCKET=smartspend-c8e7c.firebaseapp.com
+VITE_FIREBASE_STORAGE_BUCKET=smartspend-c8e7c.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=659202943545
 VITE_FIREBASE_APP_ID=1:659202943545:web:d295553ab4d715f9b67be8
+VITE_FIREBASE_MEASUREMENTID=G-K1ZMKTSY7F
 ```
 
 ### Optional: Gemini API Key (for AI features)
 
 ```
-VITE_GEMINI_API_KEY=your-gemini-api-key-here
+VITE_GEMINI_API_KEY=AIzaSyDvdCmbhaA0V44x3xLjKyrNDAIqEJ5mAjs
 ```
 
 **Note:** If you don't have a Gemini API key, you can leave this empty or use a placeholder. The app will work with mock AI advice.
