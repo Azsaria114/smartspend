@@ -7,7 +7,6 @@ import {
   doc, 
   query, 
   where, 
-  orderBy,
   onSnapshot,
   Timestamp
 } from 'firebase/firestore';
@@ -26,22 +25,12 @@ export function useExpenses(userId) {
 
     const expensesRef = collection(db, 'expenses');
     
-    // Try with orderBy, fallback to just where if index doesn't exist
-    let q;
-    try {
-      q = query(
-        expensesRef, 
-        where('userId', '==', userId),
-        orderBy('date', 'desc')
-      );
-    } catch (error) {
-      // If index doesn't exist, just query by userId
-      console.warn('Index may not exist, using simpler query:', error);
-      q = query(
-        expensesRef, 
-        where('userId', '==', userId)
-      );
-    }
+    // Start with simpler query (no orderBy) to avoid index requirement
+    // This works without needing a composite index
+    const q = query(
+      expensesRef, 
+      where('userId', '==', userId)
+    );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const expensesData = snapshot.docs.map(doc => {
@@ -69,50 +58,21 @@ export function useExpenses(userId) {
         };
       });
       
-      // Sort by date descending if we couldn't use orderBy
-      if (!q._delegate?._query?.explicitOrderBy?.length) {
-        expensesData.sort((a, b) => b.date - a.date);
-      }
+      // Sort by date descending (client-side since we're not using orderBy)
+      expensesData.sort((a, b) => b.date - a.date);
       
       setExpenses(expensesData);
       setLoading(false);
-    }, (error) => {
-      console.error('Error fetching expenses:', error);
-      // If index error, try simpler query
-      if (error.code === 'failed-precondition') {
-        console.warn('Index not found. Please create a composite index in Firebase Console.');
-        const simpleQuery = query(
-          expensesRef,
-          where('userId', '==', userId)
-        );
-        onSnapshot(simpleQuery, (snapshot) => {
-          const expensesData = snapshot.docs.map(doc => {
-            const data = doc.data();
-            let dateValue;
-            if (data.date?.toDate) {
-              dateValue = data.date.toDate();
-            } else if (data.date?.seconds) {
-              dateValue = new Date(data.date.seconds * 1000);
-            } else if (data.date) {
-              dateValue = new Date(data.date);
-            } else {
-              dateValue = new Date();
-            }
-            
-            return {
-              id: doc.id,
-              ...data,
-              date: dateValue,
-              amount: Number(data.amount) || 0
-            };
-          });
-          expensesData.sort((a, b) => b.date - a.date);
-          setExpenses(expensesData);
-          setLoading(false);
-        });
-      } else {
-        setLoading(false);
+      
+      // Mark that user has expenses if any exist
+      if (expensesData.length > 0) {
+        localStorage.setItem('smartspend.hasExpenses', 'true');
       }
+    }, (error) => {
+      // Handle any errors
+      console.error('Error fetching expenses:', error);
+      setExpenses([]);
+      setLoading(false);
     });
 
     return () => unsubscribe();

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useExpenses } from '../hooks/useExpenses';
@@ -25,14 +25,7 @@ export default function Signup() {
     }
   }, []);
 
-  // Import pending expenses after user is authenticated
-  useEffect(() => {
-    if (currentUser) {
-      importPendingExpenses();
-    }
-  }, [currentUser]);
-
-  async function importPendingExpenses() {
+  const importPendingExpenses = useCallback(async () => {
     try {
       // Import sample expenses
       const sampleExpenses = JSON.parse(localStorage.getItem('smartspend.sampleExpenses') || '[]');
@@ -54,7 +47,14 @@ export default function Signup() {
     } catch (error) {
       console.error('Error importing pending expenses:', error);
     }
-  }
+  }, [currentUser, addExpense]);
+
+  // Import pending expenses after user is authenticated
+  useEffect(() => {
+    if (currentUser) {
+      importPendingExpenses();
+    }
+  }, [currentUser, importPendingExpenses]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -77,10 +77,34 @@ export default function Signup() {
       
       await signup(email, password, finalDisplayName);
       
-      // Import pending expenses will be handled by useEffect when currentUser is set
-      navigate('/dashboard');
+      // Mark that user has just signed up (for onboarding redirect)
+      localStorage.setItem('smartspend.justSignedUp', 'true');
+      localStorage.setItem('smartspend.hasExpenses', 'false');
+      
+      // Small delay to ensure auth state is updated
+      setTimeout(() => {
+        // Check if onboarding should be shown
+        const hasOnboarding = localStorage.getItem('smartspend.onboarding.completed') !== 'true';
+        if (hasOnboarding) {
+          navigate('/onboarding', { replace: true });
+        } else {
+          navigate('/dashboard');
+        }
+      }, 200);
     } catch (err) {
-      setError(err.message || 'Failed to create an account');
+      console.error('Signup error:', err);
+      // Handle specific Firebase errors
+      let errorMessage = 'Failed to create an account';
+      if (err.code === 'auth/email-already-in-use') {
+        errorMessage = 'Email is already registered. Please sign in instead';
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address';
+      } else if (err.code === 'auth/weak-password') {
+        errorMessage = 'Password is too weak. Please use a stronger password';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -105,8 +129,10 @@ export default function Signup() {
         {error && (
           <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 animate-fade-in">
             <div className="flex items-center gap-2">
-              <span>⚠️</span>
-              <span className="font-medium">{error}</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="font-medium text-sm">{error}</span>
             </div>
           </div>
         )}

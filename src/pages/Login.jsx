@@ -17,9 +17,28 @@ export default function Login() {
       setError('');
       setLoading(true);
       await login(email, password);
-      navigate('/dashboard');
+      // Mark that this is a returning user (not just signed up)
+      localStorage.removeItem('smartspend.justSignedUp');
+      // Small delay to ensure auth state is updated
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 100);
     } catch (err) {
-      setError(err.message || 'Failed to log in');
+      console.error('Login error:', err);
+      // Handle specific Firebase errors
+      let errorMessage = 'Failed to log in';
+      if (err.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email';
+      } else if (err.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password';
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address';
+      } else if (err.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed attempts. Please try again later';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -44,8 +63,10 @@ export default function Login() {
         {error && (
           <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 animate-fade-in">
             <div className="flex items-center gap-2">
-              <span>⚠️</span>
-              <span className="font-medium">{error}</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="font-medium text-sm">{error}</span>
             </div>
           </div>
         )}

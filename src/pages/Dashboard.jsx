@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useExpenses } from '../hooks/useExpenses';
+import { Link } from 'react-router-dom';
 import ExpenseForm from '../components/ExpenseForm';
 import ExpenseList from '../components/ExpenseList';
 import EnhancedCharts from '../components/EnhancedCharts';
@@ -10,9 +11,8 @@ import Modal from '../components/Modal';
 import FloatingActionButton from '../components/FloatingActionButton';
 import CategoryCards from '../components/CategoryCards';
 import GuidedTour from '../components/GuidedTour';
-import NotificationCenter from '../components/NotificationCenter';
 import { useNotifications } from '../hooks/useNotifications';
-import { Link } from 'react-router-dom';
+import Header from '../components/Header';
 
 const STORAGE_KEY = 'smartBudget.settings.v1';
 function loadBudget() {
@@ -31,7 +31,6 @@ export default function Dashboard() {
   const [showFormModal, setShowFormModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
-  const [dateFilter, setDateFilter] = useState('month');
 
   useEffect(() => {
     if (expenses && expenses.length >= 0) {
@@ -190,133 +189,110 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-900 flex">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'block' : 'hidden'} lg:block fixed lg:static inset-y-0 left-0 z-40`}>
+      <div className={`${sidebarOpen ? 'block' : 'hidden'} lg:block fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 lg:h-screen`}>
         <Sidebar onClose={() => setSidebarOpen(false)} />
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:ml-0">
-        {/* Top Header */}
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
-          <div className="px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <span className="text-xl">☰</span>
-                </button>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">Dashboard</h2>
-                  <p className="text-xs text-gray-500">
-                    {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <NotificationCenter
-                  notifications={notifications}
-                  unreadCount={unreadCount}
-                  onMarkAsRead={markAsRead}
-                  onMarkAllAsRead={markAllAsRead}
-                />
-                <button
-                  id="add-expense"
-                  onClick={() => {
-                    setEditingExpense(null);
-                    setShowFormModal(true);
-                  }}
-                  className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors text-sm font-medium flex items-center gap-2"
-                >
-                  <span>+</span>
-                  <span className="hidden sm:inline">Add Expense</span>
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Mobile Menu Button */}
+          <div className="lg:hidden fixed top-4 left-4 z-50">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 bg-gray-800 text-gray-400 hover:bg-gray-700 rounded-lg transition-colors shadow-lg"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
-        </header>
+
+          {/* Unified Header */}
+          <Header
+          showNotifications={true}
+          showAddExpense={true}
+          onAddExpense={() => {
+            setEditingExpense(null);
+            setShowFormModal(true);
+          }}
+          notifications={notifications}
+          unreadCount={unreadCount}
+          onMarkAsRead={markAsRead}
+          onMarkAllAsRead={markAllAsRead}
+          onLogout={handleLogout}
+        />
 
         {/* Main Content Area */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gray-50">
-          {/* Greeting */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">
-              {getGreeting()}, {currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User'}!
-            </h1>
-          </div>
+        <main className="flex-1 bg-gray-900 overflow-y-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            {/* Greeting */}
+            <div className="mb-6 mt-4">
+              <h1 className="text-2xl font-semibold text-white">
+                {getGreeting()}, {currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User'}
+              </h1>
+            </div>
 
-          {/* Main Balance Card - Single Source of Truth */}
-          <div className="mb-6" id="balance">
-            {monthlyIncome > 0 ? (
-              <div className="bg-gradient-to-br from-teal-600 via-teal-500 to-teal-700 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4">
+            {/* Main Balance Card - Single Source of Truth */}
+            <div className="mb-6" id="balance">
+              {monthlyIncome > 0 ? (
+                <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 shadow-lg">
+                  <div className="flex items-start justify-between mb-6">
                     <div>
-                      <p className="text-white/90 text-sm font-medium mb-1">Available Balance</p>
-                      <h2 className="text-4xl sm:text-5xl font-bold">₹{availableBalance.toFixed(2)}</h2>
+                      <p className="text-sm font-medium text-gray-400 mb-1">Available Balance</p>
+                      <h2 className="text-3xl font-bold text-white">₹{availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                     </div>
                     <div className="text-right">
-                      <p className="text-white/80 text-xs mb-1">Monthly Income</p>
-                      <p className="text-xl font-semibold">₹{monthlyIncome.toFixed(2)}</p>
+                      <p className="text-sm font-medium text-gray-400 mb-1">Monthly Income</p>
+                      <p className="text-xl font-semibold text-white">₹{monthlyIncome.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                   </div>
                   
-                  <div className="mt-6 pt-4 border-t border-white/20">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-white/80 text-xs mb-1">Spent This Month</p>
-                        <p className="text-lg font-semibold">₹{thisMonthTotal.toFixed(2)}</p>
-                      </div>
-                      {monthlyBudgetTotal > 0 && (
-                        <div className="text-right">
-                          <p className="text-white/80 text-xs mb-1">Budget Progress</p>
-                          <div className="flex items-center gap-2">
-                            <div className="w-24 h-2 bg-white/20 rounded-full overflow-hidden">
-                              <div 
-                                className={`h-full rounded-full transition-all ${
-                                  budgetProgressPct >= 100 ? 'bg-red-300' : 
-                                  budgetProgressPct >= 80 ? 'bg-yellow-300' : 
-                                  'bg-white'
-                                }`}
-                                style={{ width: `${Math.min(100, budgetProgressPct)}%` }}
-                              />
-                            </div>
-                            <span className="text-sm font-semibold">{budgetProgressPct.toFixed(0)}%</span>
-                          </div>
-                        </div>
-                      )}
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700">
+                    <div>
+                      <p className="text-xs text-gray-400 mb-1">Spent This Month</p>
+                      <p className="text-lg font-semibold text-white">₹{thisMonthTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
+                    {monthlyBudgetTotal > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-xs text-gray-400">Budget Progress</p>
+                          <span className="text-xs font-medium text-gray-300">{budgetProgressPct.toFixed(0)}%</span>
+                        </div>
+                        <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all ${
+                              budgetProgressPct >= 100 ? 'bg-red-500' : 
+                              budgetProgressPct >= 80 ? 'bg-yellow-500' : 
+                              'bg-gradient-to-r from-indigo-500 to-purple-600'
+                            }`}
+                            style={{ width: `${Math.min(100, budgetProgressPct)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-purple-700 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
-                <div className="relative z-10">
-                  <p className="text-white/90 text-sm font-medium mb-2">Total Expenses</p>
-                  <h2 className="text-4xl sm:text-5xl font-bold mb-1">₹{thisMonthTotal.toFixed(2)}</h2>
-                  <p className="text-white/80 text-sm">{thisMonthExpenses.length} transactions this month</p>
-                  <Link 
-                    to="/insights"
-                    className="inline-block mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
-                  >
-                    Set up budget →
-                  </Link>
+              ) : (
+                <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 shadow-lg">
+                  <div>
+                    <p className="text-sm font-medium text-gray-400 mb-1">Total Expenses</p>
+                    <h2 className="text-3xl font-bold text-white mb-2">₹{thisMonthTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                    <p className="text-sm text-gray-400 mb-4">{thisMonthExpenses.length} transactions this month</p>
+                    <Link 
+                      to="/insights"
+                      className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg"
+                    >
+                      Set up budget
+                      <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
           {/* Category Cards */}
           {thisMonthExpenses.length > 0 && (
@@ -329,98 +305,98 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             {/* Spending Analytics - Charts Only */}
             <div className="lg:col-span-2" id="analytics">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900">Spending Analytics</h3>
-                  <Link to="/insights" className="text-sm text-teal-600 hover:text-teal-700 font-medium">
+              <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 shadow-lg">
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className="text-lg font-semibold text-white">Spending Analytics</h3>
+                  <Link to="/insights" className="text-sm text-indigo-400 hover:text-indigo-300 font-medium">
                     View All →
                   </Link>
                 </div>
                 {thisMonthExpenses.length > 0 ? (
                   <EnhancedCharts expenses={thisMonthExpenses} />
                 ) : (
-                  <div className="text-center py-12 text-gray-500">
-                    <p className="text-sm">No expenses this month yet</p>
+                  <div className="text-center py-12">
+                    <p className="text-sm mb-3 text-gray-400">No expenses this month yet</p>
                     <button
                       onClick={() => setShowFormModal(true)}
-                      className="mt-3 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
+                      className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg"
                     >
                       Add Your First Expense
                     </button>
                   </div>
                 )}
               </div>
-            </div>
+        </div>
 
             {/* Top Categories - Quick Insight */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Top Categories</h3>
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 shadow-lg">
+              <h3 className="text-lg font-semibold text-white mb-4">Top Categories</h3>
               {topCategories.length > 0 ? (
                 <div className="space-y-4">
                   {topCategories.map(([category, amount], index) => {
                     const percentage = (amount / thisMonthTotal) * 100;
                     const colors = [
-                      'bg-orange-500',
-                      'bg-blue-500',
-                      'bg-purple-500'
+                      'bg-gradient-to-r from-orange-500 to-red-500',
+                      'bg-gradient-to-r from-blue-500 to-cyan-500',
+                      'bg-gradient-to-r from-purple-500 to-pink-500'
                     ];
                     return (
                       <div key={category}>
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <div className={`w-3 h-3 rounded-full ${colors[index] || 'bg-gray-500'}`}></div>
-                            <span className="text-sm font-medium text-gray-700">{category}</span>
+                            <span className="text-sm font-medium text-gray-300">{category}</span>
                           </div>
-                          <span className="text-sm font-bold text-gray-900">₹{amount.toFixed(2)}</span>
+                          <span className="text-sm font-bold text-white">₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
-                        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
                           <div 
                             className={`h-full ${colors[index] || 'bg-gray-500'} rounded-full transition-all`}
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">{percentage.toFixed(1)}% of monthly spending</p>
+                        <p className="text-xs text-gray-400 mt-1">{percentage.toFixed(1)}% of monthly spending</p>
                       </div>
                     );
                   })}
                   <Link 
                     to="/insights"
-                    className="block mt-4 text-center text-sm text-teal-600 hover:text-teal-700 font-medium"
+                    className="block mt-4 text-center text-sm text-indigo-400 hover:text-indigo-300 font-medium"
                   >
                     View All Categories →
                   </Link>
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <p className="text-sm">No spending yet this month</p>
+                <div className="text-center py-8">
+                  <p className="text-sm text-gray-400">No spending yet this month</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Recent Transactions - Limited List */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gray-900">Recent Transactions</h3>
+          <div className="bg-gray-800 rounded-lg border border-gray-700 shadow-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white">Recent Transactions</h3>
               <Link 
                 to="/insights" 
-                className="text-sm text-teal-600 hover:text-teal-700 font-medium"
+                className="text-sm text-indigo-400 hover:text-indigo-300 font-medium"
               >
                 View All →
               </Link>
             </div>
             
             {recentExpenses.length > 0 ? (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-700">
                 {recentExpenses.map((expense) => {
                   const categoryColors = {
-                    Food: 'bg-orange-100 text-orange-700',
-                    Transport: 'bg-blue-100 text-blue-700',
-                    Shopping: 'bg-purple-100 text-purple-700',
-                    Bills: 'bg-red-100 text-red-700',
-                    Entertainment: 'bg-pink-100 text-pink-700',
-                    Health: 'bg-green-100 text-green-700',
-                    Other: 'bg-gray-100 text-gray-700'
+                    Food: 'bg-orange-500/20 text-orange-300 border border-orange-500/30',
+                    Transport: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
+                    Shopping: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
+                    Bills: 'bg-red-500/20 text-red-300 border border-red-500/30',
+                    Entertainment: 'bg-pink-500/20 text-pink-300 border border-pink-500/30',
+                    Health: 'bg-green-500/20 text-green-300 border border-green-500/30',
+                    Other: 'bg-gray-500/20 text-gray-300 border border-gray-500/30'
                   };
                   
                   const categoryIcons = {
@@ -436,7 +412,7 @@ export default function Dashboard() {
                   return (
                     <div 
                       key={expense.id}
-                      className="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                      className="p-4 hover:bg-gray-700/50 transition-colors cursor-pointer"
                       onClick={() => handleEdit(expense)}
                     >
                       <div className="flex items-center justify-between">
@@ -445,8 +421,8 @@ export default function Dashboard() {
                             {categoryIcons[expense.category] || '📦'}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-gray-900 truncate">{expense.description}</p>
-                            <p className="text-xs text-gray-500">
+                            <p className="font-semibold text-white truncate">{expense.description}</p>
+                            <p className="text-xs text-gray-400">
                               {new Date(expense.date).toLocaleDateString('en-US', { 
                                 month: 'short', 
                                 day: 'numeric',
@@ -456,16 +432,18 @@ export default function Dashboard() {
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="text-lg font-bold text-gray-900">₹{expense.amount.toFixed(2)}</span>
+                          <span className="text-lg font-bold text-white">₹{expense.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDelete(expense.id);
                             }}
-                            className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                            className="p-1.5 text-red-400 hover:bg-red-500/20 rounded transition-colors"
                             title="Delete"
                           >
-                            🗑️
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
                           </button>
                         </div>
                       </div>
@@ -475,19 +453,21 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="p-12 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl">📝</span>
+                <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
                 </div>
-                <p className="text-gray-600 font-medium mb-2">No transactions yet</p>
-                <p className="text-sm text-gray-500 mb-4">Start tracking your expenses</p>
+                <p className="text-gray-300 font-medium mb-2">No transactions yet</p>
+                <p className="text-sm text-gray-400 mb-4">Start tracking your expenses</p>
                 <button
                   onClick={() => setShowFormModal(true)}
-                  className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
+                  className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg"
                 >
                   Add Your First Expense
                 </button>
-              </div>
-            )}
+          </div>
+        )}
           </div>
 
           {/* Filters - Only shown when there are expenses */}
@@ -495,14 +475,15 @@ export default function Dashboard() {
             <div className="mt-6">
               <ExpenseFilters onFilterChange={handleFilterChange} />
               <div className="mt-4">
-                <ExpenseList
+            <ExpenseList
                   expenses={filteredExpenses}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              </div>
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
             </div>
           )}
+          </div>
         </main>
       </div>
 

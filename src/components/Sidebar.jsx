@@ -6,31 +6,27 @@ export default function Sidebar({ onClose }) {
   const navItems = [
     { 
       path: '/dashboard', 
-      icon: '📊', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
       label: 'Dashboard',
       type: 'link'
     },
     { 
       path: '/insights', 
-      icon: '🤖', 
-      label: 'AI Assistant',
-      type: 'tab',
-      tab: 'chat'
-    },
-    { 
-      path: '/insights', 
-      icon: '🧮', 
-      label: 'Budget Planner',
-      type: 'tab',
-      tab: 'budget'
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+      label: 'Insights',
+      type: 'link'
     },
   ];
 
   const isActive = (item) => {
-    if (item.type === 'tab') {
-      // Check if we're on insights page and tab matches
-      return location.pathname === '/insights';
-    }
     return location.pathname === item.path;
   };
 
@@ -43,34 +39,27 @@ export default function Sidebar({ onClose }) {
       />
 
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-72 glass-effect border-r border-white/20 z-50 lg:static lg:z-auto shadow-xl lg:shadow-none">
+      <aside className="fixed left-0 top-0 h-screen w-64 lg:w-72 bg-gray-900 z-50 lg:sticky lg:top-0 lg:h-screen border-r border-gray-800">
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-white/20">
-            <Link to="/dashboard" onClick={onClose} className="flex items-center gap-3">
-              <div className="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-2xl">₹</span>
+          <div className="px-4 sm:px-6 py-4 lg:py-4 border-b border-gray-800 flex-shrink-0 h-16 flex items-center">
+            <Link to="/dashboard" onClick={onClose} className="flex items-center gap-3 w-full">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                <span className="text-white font-bold text-xl sm:text-2xl">₹</span>
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">SmartSpend</h1>
-                <p className="text-xs text-gray-500">Finance Tracker</p>
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl font-bold text-white truncate">SmartSpend</h1>
+                <p className="text-xs text-gray-400 truncate">Finance Tracker</p>
               </div>
             </Link>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 px-3 sm:px-4 py-4 sm:py-6 space-y-2 overflow-y-auto">
             {navItems.map((item, index) => {
               const active = isActive(item);
               
               const handleClick = () => {
-                if (item.type === 'tab' && item.tab) {
-                  // Navigate to insights and open specific tab
-                  setTimeout(() => {
-                    const tab = document.querySelector(`[data-tab="${item.tab}"]`);
-                    if (tab) tab.click();
-                  }, 100);
-                }
                 if (onClose) onClose();
               };
 
@@ -79,27 +68,29 @@ export default function Sidebar({ onClose }) {
                   key={index}
                   to={item.path}
                   onClick={handleClick}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium text-sm ${
+                  className={`group flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 ${
                     active
-                      ? 'sidebar-link-active shadow-md'
-                      : 'text-gray-700 hover:bg-white/50 hover:text-indigo-600'
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/50'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                   }`}
                 >
-                  <span className="text-xl">{item.icon}</span>
-                  <span>{item.label}</span>
+                  <span className={active ? 'text-white' : 'text-gray-400 group-hover:text-white'}>
+                    {item.icon}
+                  </span>
+                  <span className="font-medium text-xs sm:text-sm">{item.label}</span>
                   {active && (
-                    <span className="ml-auto w-2 h-2 bg-indigo-600 rounded-full"></span>
+                    <div className="ml-auto w-1.5 h-1.5 bg-white rounded-full"></div>
                   )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Footer */}
-          <div className="p-4 border-t border-white/20">
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-100">
-              <p className="text-xs font-semibold text-indigo-900 mb-1">💡 Pro Tip</p>
-              <p className="text-xs text-indigo-700">
+          {/* Bottom Section */}
+          <div className="px-3 sm:px-4 py-4 sm:py-6 border-t border-gray-800 flex-shrink-0 mt-auto">
+            <div className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-indigo-500/20">
+              <p className="text-xs font-semibold text-gray-300 mb-1">💡 Pro Tip</p>
+              <p className="text-xs text-gray-400 leading-relaxed">
                 Track expenses daily for better insights
               </p>
             </div>
@@ -109,4 +100,3 @@ export default function Sidebar({ onClose }) {
     </>
   );
 }
-

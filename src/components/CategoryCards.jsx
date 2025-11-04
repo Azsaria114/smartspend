@@ -39,8 +39,8 @@ export default function CategoryCards({ expenses, monthlyTotal }) {
 
   if (categories.length === 0) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Spending by Category</h3>
+      <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Spending by Category</h3>
         <div className="text-center py-8 text-gray-500">
           <p className="text-sm">No expenses yet</p>
         </div>
@@ -49,10 +49,10 @@ export default function CategoryCards({ expenses, monthlyTotal }) {
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-gray-900">Spending by Category</h3>
-        <Link to="/insights" className="text-sm text-teal-600 hover:text-teal-700 font-medium">
+    <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-lg font-semibold text-gray-900">Spending by Category</h3>
+        <Link to="/insights" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
           View All →
         </Link>
       </div>
@@ -61,30 +61,24 @@ export default function CategoryCards({ expenses, monthlyTotal }) {
         {categories.map((item) => (
           <div
             key={item.category}
-            className="group relative overflow-hidden rounded-xl border-2 border-gray-100 hover:border-gray-300 transition-all duration-200 hover:shadow-md"
+            className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-all duration-150 hover:shadow-sm"
           >
-            {/* Category Icon & Background */}
-            <div className={`bg-gradient-to-br ${item.color} p-4 relative`}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-3xl">{item.icon}</span>
-                <span className="text-white/90 text-xs font-semibold">{item.percentage.toFixed(0)}%</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{item.icon}</span>
+                <span className="font-medium text-gray-900 text-sm">{item.category}</span>
               </div>
-              <div className="text-white font-bold text-sm">{item.category}</div>
+              <span className="text-xs font-medium text-gray-500">{item.percentage.toFixed(0)}%</span>
             </div>
-
-            {/* Amount & Progress */}
-            <div className="p-4 bg-white">
-              <p className="text-2xl font-bold text-gray-900 mb-2">₹{item.amount.toFixed(2)}</p>
-              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className={`h-full bg-gradient-to-r ${item.color} rounded-full transition-all duration-300`}
-                  style={{ width: `${Math.min(100, item.percentage)}%` }}
-                />
-              </div>
+            
+            <p className="text-xl font-semibold text-gray-900 mb-3">₹{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            
+            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className={`h-full bg-gradient-to-r ${item.color} rounded-full transition-all duration-300`}
+                style={{ width: `${Math.min(100, item.percentage)}%` }}
+              />
             </div>
-
-            {/* Hover Effect Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           </div>
         ))}
       </div>

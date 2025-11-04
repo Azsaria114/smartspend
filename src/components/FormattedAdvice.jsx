@@ -68,20 +68,20 @@ export default function FormattedAdvice({ advice }) {
 
   if (!formattedContent || formattedContent.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        <p className="text-sm">No advice available</p>
+      <div className="text-center py-8">
+        <p className="text-sm text-gray-400">No advice available</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {formattedContent.map((section, index) => {
         if (section.type === 'heading') {
           return (
-            <div key={index} className="mt-6 first:mt-0">
-              <h4 className={`font-bold text-gray-900 mb-3 ${
-                section.level === 2 ? 'text-xl' : 'text-lg'
+            <div key={index} className="mt-8 first:mt-0">
+              <h4 className={`font-bold text-white mb-4 ${
+                section.level === 2 ? 'text-2xl' : 'text-xl'
               }`}>
                 {section.content}
               </h4>
@@ -91,11 +91,11 @@ export default function FormattedAdvice({ advice }) {
 
         if (section.type === 'list') {
           return (
-            <ul key={index} className="space-y-2 ml-4">
+            <ul key={index} className="space-y-3 ml-2">
               {section.content.map((item, itemIndex) => (
                 <li key={itemIndex} className="flex items-start gap-3">
-                  <span className="text-indigo-600 mt-1.5 flex-shrink-0">•</span>
-                  <span className="text-gray-800 leading-relaxed">{item}</span>
+                  <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-gray-300 leading-relaxed text-base">{item}</span>
                 </li>
               ))}
             </ul>
@@ -103,9 +103,9 @@ export default function FormattedAdvice({ advice }) {
         }
 
         return (
-          <div key={index} className="space-y-2">
+          <div key={index} className="space-y-3">
             {section.content.map((para, paraIndex) => (
-              <p key={paraIndex} className="text-gray-800 leading-relaxed">
+              <p key={paraIndex} className="text-gray-300 leading-relaxed text-base">
                 {para}
               </p>
             ))}
@@ -115,4 +115,3 @@ export default function FormattedAdvice({ advice }) {
     </div>
   );
 }
-
