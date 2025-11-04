@@ -527,7 +527,7 @@ export default function Dashboard() {
           )}
           </div>
         </main>
-        </div>
+      </div>
 
       {/* Guided Tour */}
       <GuidedTour />
