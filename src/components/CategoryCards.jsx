@@ -39,9 +39,9 @@ export default function CategoryCards({ expenses, monthlyTotal }) {
 
   if (categories.length === 0) {
     return (
-      <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Spending by Category</h3>
-        <div className="text-center py-8 text-gray-500">
+      <div className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-lg p-6 border border-gray-700/50 shadow-lg">
+        <h3 className="text-lg font-semibold text-white mb-4">Spending by Category</h3>
+        <div className="text-center py-8 text-gray-400">
           <p className="text-sm">No expenses yet</p>
         </div>
       </div>
@@ -49,10 +49,13 @@ export default function CategoryCards({ expenses, monthlyTotal }) {
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+    <div className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-lg p-6 border border-gray-700/50 shadow-lg relative">
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none rounded-lg"></div>
+      <div className="relative z-10">
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-lg font-semibold text-gray-900">Spending by Category</h3>
-        <Link to="/insights" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+        <h3 className="text-lg font-semibold text-white">Spending by Category</h3>
+        <Link to="/insights" className="text-sm text-indigo-400 hover:text-indigo-300 font-medium">
           View All →
         </Link>
       </div>
@@ -61,19 +64,19 @@ export default function CategoryCards({ expenses, monthlyTotal }) {
         {categories.map((item) => (
           <div
             key={item.category}
-            className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-all duration-150 hover:shadow-sm"
+            className="bg-gray-700/40 border border-gray-600/50 rounded-lg p-4 hover:border-gray-500/50 transition-all duration-150 hover:shadow-sm"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">{item.icon}</span>
-                <span className="font-medium text-gray-900 text-sm">{item.category}</span>
+                <span className="font-medium text-white text-sm">{item.category}</span>
               </div>
-              <span className="text-xs font-medium text-gray-500">{item.percentage.toFixed(0)}%</span>
+              <span className="text-xs font-medium text-gray-400">{item.percentage.toFixed(0)}%</span>
             </div>
             
-            <p className="text-xl font-semibold text-gray-900 mb-3">₹{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p className="text-xl font-semibold text-white mb-3">₹{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             
-            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-gray-700 rounded-full overflow-hidden">
               <div
                 className={`h-full bg-gradient-to-r ${item.color} rounded-full transition-all duration-300`}
                 style={{ width: `${Math.min(100, item.percentage)}%` }}
@@ -81,6 +84,7 @@ export default function CategoryCards({ expenses, monthlyTotal }) {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

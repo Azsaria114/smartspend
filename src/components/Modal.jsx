@@ -18,7 +18,7 @@ export default function Modal({ isOpen, onClose, children, title }) {
     <>
       <div className="modal-overlay" onClick={onClose} />
       <div className="modal-content w-full max-w-lg mx-4">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden border border-gray-700/50">
           {title && (
             <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
               <div className="flex items-center justify-between">

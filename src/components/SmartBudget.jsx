@@ -106,33 +106,36 @@ export default function SmartBudget({ expenses }) {
   ];
 
   return (
-    <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 shadow-lg">
-      <div className="flex items-center gap-4 mb-6">
-        <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 shadow-lg relative">
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none rounded-lg"></div>
+      <div className="relative z-10">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
           </svg>
         </div>
         <div>
-          <h3 className="text-xl font-bold text-white">Smart Budgeting</h3>
-          <p className="text-sm text-gray-400">Set income and category allocations</p>
+          <h3 className="text-lg font-bold text-white">Smart Budgeting</h3>
+          <p className="text-xs text-gray-400">Set income and category allocations</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 bg-gray-700/50 rounded-lg border border-gray-600 p-5">
-          <label className="block text-sm font-semibold text-gray-200 mb-3">Monthly Income (₹)</label>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-1 bg-gray-700/50 rounded-lg border border-gray-600 p-4">
+          <label className="block text-sm font-semibold text-gray-200 mb-2">Monthly Income (₹)</label>
           <input
             type="number"
             min="0"
             value={monthlyIncome}
             onChange={(e) => setMonthlyIncome(e.target.value)}
             placeholder="e.g., 50000"
-            className="w-full px-4 py-3 bg-gray-600 border border-gray-500 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm text-white placeholder-gray-400"
+            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm text-white placeholder-gray-400"
           />
 
-          <div className="mt-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-semibold text-gray-200">Category Allocations</span>
               <span className={`text-sm font-bold ${
                 totalAllocPercent > 100 ? 'text-red-400' : 
@@ -142,10 +145,10 @@ export default function SmartBudget({ expenses }) {
                 {totalAllocPercent.toFixed(0)}%
               </span>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {DEFAULT_CATEGORIES.map((cat) => (
-                <div key={cat} className="flex items-center gap-3">
-                  <span className="w-24 text-xs text-gray-300 font-medium">{cat}</span>
+                <div key={cat} className="flex items-center gap-2">
+                  <span className="w-20 text-xs text-gray-300 font-medium">{cat}</span>
                   <input
                     type="number"
                     min="0"
@@ -153,42 +156,49 @@ export default function SmartBudget({ expenses }) {
                     step="0.5"
                     value={allocations[cat] ?? 0}
                     onChange={(e) => handleAllocChange(cat, e.target.value)}
-                    className="flex-1 px-3 py-2 bg-gray-600 border border-gray-500 rounded text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                    className="flex-1 px-2 py-1.5 bg-gray-600 border border-gray-500 rounded text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
                   />
-                  <span className="text-xs text-gray-400 w-8">%</span>
+                  <span className="text-xs text-gray-400 w-6">%</span>
                 </div>
               ))}
             </div>
 
-            <div className="mt-4 text-xs text-gray-400 bg-gray-600/50 p-3 rounded-lg border border-gray-500">
+            <div className="mt-3 text-xs text-gray-400 bg-gray-600/50 p-2 rounded-lg border border-gray-500">
               💡 Tip: Aim for ~100% total allocation
             </div>
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-gray-700/50 rounded-lg border border-gray-600 p-5">
-          <h4 className="text-sm font-semibold text-gray-200 mb-4">Budget Progress by Category</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="lg:col-span-2 bg-gray-700/50 rounded-lg border border-gray-600 p-4">
+          <h4 className="text-sm font-semibold text-gray-200 mb-3">Budget Progress by Category</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {DEFAULT_CATEGORIES.map((cat, idx) => {
               const target = (monthlyIncomeNumber * (Number(allocations[cat] || 0) / 100));
               const spent = spendByCategory[cat] || 0;
               const pct = progress(spent, target);
               const colorClass = categoryColors[idx % categoryColors.length];
               return (
-                <div key={cat} className="p-4 bg-gray-800 rounded-lg border border-gray-600 hover:border-gray-500 transition-colors">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${colorClass} flex items-center justify-center text-white text-sm font-bold`}>
+                <div key={cat} className={`p-3 rounded-lg border hover:border-opacity-70 transition-colors bg-gradient-to-br ${
+                  idx % 6 === 0 ? 'from-orange-600/10 to-orange-800/10 border-orange-500/30' :
+                  idx % 6 === 1 ? 'from-blue-600/10 to-blue-800/10 border-blue-500/30' :
+                  idx % 6 === 2 ? 'from-purple-600/10 to-purple-800/10 border-purple-500/30' :
+                  idx % 6 === 3 ? 'from-red-600/10 to-red-800/10 border-red-500/30' :
+                  idx % 6 === 4 ? 'from-pink-600/10 to-pink-800/10 border-pink-500/30' :
+                  'from-green-600/10 to-green-800/10 border-green-500/30'
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${colorClass} flex items-center justify-center text-white text-xs font-bold`}>
                         {cat[0]}
                       </div>
                       <span className="font-semibold text-white text-sm">{cat}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs text-gray-400 block">₹{spent.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                      <span className="text-xs text-gray-300 block">₹{spent.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                       <span className="text-xs text-gray-500">/ ₹{target.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                     </div>
                   </div>
-                  <div className="w-full h-2.5 bg-gray-600 rounded-full overflow-hidden mb-2">
+                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden mb-1.5">
                     <div
                       className={`h-full rounded-full transition-all bg-gradient-to-r ${colorClass} ${
                         pct >= 100 ? 'from-red-500 to-red-600' : 
@@ -201,10 +211,10 @@ export default function SmartBudget({ expenses }) {
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400">{pct.toFixed(0)}% of budget</span>
                     {pct >= 100 && (
-                      <span className="text-xs text-red-400 font-medium">⚠️ Over budget</span>
+                      <span className="text-xs text-red-400 font-medium">⚠️ Over</span>
                     )}
                     {pct >= 80 && pct < 100 && (
-                      <span className="text-xs text-yellow-400 font-medium">⚠️ Near limit</span>
+                      <span className="text-xs text-yellow-400 font-medium">⚠️ Near</span>
                     )}
                   </div>
                 </div>
@@ -212,6 +222,7 @@ export default function SmartBudget({ expenses }) {
             })}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

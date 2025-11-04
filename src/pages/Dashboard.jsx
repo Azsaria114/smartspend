@@ -4,9 +4,9 @@ import { useExpenses } from '../hooks/useExpenses';
 import { Link } from 'react-router-dom';
 import ExpenseForm from '../components/ExpenseForm';
 import ExpenseList from '../components/ExpenseList';
+import ExpenseFilters from '../components/ExpenseFilters';
 import EnhancedCharts from '../components/EnhancedCharts';
 import Sidebar from '../components/Sidebar';
-import ExpenseFilters from '../components/ExpenseFilters';
 import Modal from '../components/Modal';
 import FloatingActionButton from '../components/FloatingActionButton';
 import CategoryCards from '../components/CategoryCards';
@@ -31,6 +31,7 @@ export default function Dashboard() {
   const [showFormModal, setShowFormModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
+  const [showAllExpenses, setShowAllExpenses] = useState(false);
 
   useEffect(() => {
     if (expenses && expenses.length >= 0) {
@@ -87,11 +88,6 @@ export default function Dashboard() {
   const topCategories = Object.entries(spendByCategory)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 3);
-
-  // Recent expenses (last 5)
-  const recentExpenses = useMemo(() => {
-    return [...expenses].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-  }, [expenses]);
 
   const handleFilterChange = (filters) => {
     let filtered = [...expenses];
@@ -179,24 +175,44 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <div className="text-lg text-gray-600 font-medium">Loading your finances...</div>
+          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="text-lg text-gray-300 font-medium">Loading your finances...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex">
+    <div className="min-h-screen bg-gray-900 flex relative overflow-hidden">
+      {/* Enhanced Animated Background */}
+      <div className="absolute inset-0 bg-gray-900">
+        {/* Animated gradient orbs */}
+        <div className="absolute top-0 -left-20 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 -right-20 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-pink-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+        
+        {/* Radial gradients */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(99,102,241,0.12),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(147,51,234,0.12),transparent_50%)]"></div>
+        
+        {/* Additional floating shapes for depth */}
+        <div className="absolute top-20 left-20 w-32 h-32 bg-indigo-500/8 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-20 right-20 w-40 h-40 bg-purple-500/8 rounded-full blur-2xl"></div>
+        <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-pink-500/8 rounded-full blur-2xl"></div>
+      </div>
+
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'block' : 'hidden'} lg:block fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 lg:h-screen`}>
-        <Sidebar onClose={() => setSidebarOpen(false)} />
+      <div className={`${sidebarOpen ? 'block' : 'hidden'} lg:block fixed lg:fixed inset-y-0 left-0 z-40 lg:h-screen`}>
+        <Sidebar onClose={() => setSidebarOpen(false)} onLogout={handleLogout} />
       </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 relative z-10 lg:ml-64 xl:ml-72">
           {/* Mobile Menu Button */}
           <div className="lg:hidden fixed top-4 left-4 z-50">
             <button
@@ -209,47 +225,51 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Unified Header */}
-          <Header
-          showNotifications={true}
-          showAddExpense={true}
-          onAddExpense={() => {
-            setEditingExpense(null);
-            setShowFormModal(true);
-          }}
-          notifications={notifications}
-          unreadCount={unreadCount}
-          onMarkAsRead={markAsRead}
-          onMarkAllAsRead={markAllAsRead}
-          onLogout={handleLogout}
-        />
+          {/* Unified Header - Fixed Sticky */}
+          <div className="fixed top-0 left-0 right-0 z-30 lg:left-64 xl:left-72">
+            <Header
+              showNotifications={true}
+              showAddExpense={true}
+              onAddExpense={() => {
+                setEditingExpense(null);
+                setShowFormModal(true);
+              }}
+              notifications={notifications}
+              unreadCount={unreadCount}
+              onMarkAsRead={markAsRead}
+              onMarkAllAsRead={markAllAsRead}
+            />
+          </div>
+
+          {/* Spacer for fixed header */}
+          <div className="h-16"></div>
 
         {/* Main Content Area */}
-        <main className="flex-1 bg-gray-900 overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
             {/* Greeting */}
-            <div className="mb-6 mt-4">
+            <div className="mb-4 mt-2">
               <h1 className="text-2xl font-semibold text-white">
                 {getGreeting()}, {currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User'}
               </h1>
             </div>
 
             {/* Main Balance Card - Single Source of Truth */}
-            <div className="mb-6" id="balance">
+            <div className="mb-4" id="balance">
               {monthlyIncome > 0 ? (
-                <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 shadow-lg">
-                  <div className="flex items-start justify-between mb-6">
+                <div className="bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-pink-600/20 rounded-lg border border-indigo-500/30 p-5 shadow-lg">
+                  <div className="flex items-start justify-between mb-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-400 mb-1">Available Balance</p>
+                      <p className="text-sm font-medium text-indigo-300 mb-1">Available Balance</p>
                       <h2 className="text-3xl font-bold text-white">₹{availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-gray-400 mb-1">Monthly Income</p>
+                      <p className="text-sm font-medium text-purple-300 mb-1">Monthly Income</p>
                       <p className="text-xl font-semibold text-white">₹{monthlyIncome.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700">
+                  <div className="grid grid-cols-2 gap-4 pt-3 border-t border-indigo-500/20">
                     <div>
                       <p className="text-xs text-gray-400 mb-1">Spent This Month</p>
                       <p className="text-lg font-semibold text-white">₹{thisMonthTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
@@ -260,7 +280,7 @@ export default function Dashboard() {
                           <p className="text-xs text-gray-400">Budget Progress</p>
                           <span className="text-xs font-medium text-gray-300">{budgetProgressPct.toFixed(0)}%</span>
                         </div>
-                        <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
                           <div 
                             className={`h-full rounded-full transition-all ${
                               budgetProgressPct >= 100 ? 'bg-red-500' : 
@@ -275,40 +295,40 @@ export default function Dashboard() {
                   </div>
                 </div>
               ) : (
-                <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 shadow-lg">
+                <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-lg border border-blue-500/30 p-5 shadow-lg">
                   <div>
-                    <p className="text-sm font-medium text-gray-400 mb-1">Total Expenses</p>
+                    <p className="text-sm font-medium text-blue-300 mb-1">Total Expenses</p>
                     <h2 className="text-3xl font-bold text-white mb-2">₹{thisMonthTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                     <p className="text-sm text-gray-400 mb-4">{thisMonthExpenses.length} transactions this month</p>
-                    <Link 
-                      to="/insights"
+                <Link
+                  to="/insights"
                       className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg"
-                    >
+                >
                       Set up budget
                       <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                    </Link>
-                  </div>
-                </div>
+                </Link>
+              </div>
+            </div>
               )}
             </div>
 
           {/* Category Cards */}
           {thisMonthExpenses.length > 0 && (
-            <div className="mb-6" id="category-cards">
+            <div className="mb-4" id="category-cards">
               <CategoryCards expenses={thisMonthExpenses} monthlyTotal={thisMonthTotal} />
             </div>
           )}
 
           {/* Main Grid - Each Section Has Unique Purpose */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
             {/* Spending Analytics - Charts Only */}
             <div className="lg:col-span-2" id="analytics">
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-5">
+              <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-lg border border-purple-500/30 p-5 shadow-lg">
+                <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-white">Spending Analytics</h3>
-                  <Link to="/insights" className="text-sm text-indigo-400 hover:text-indigo-300 font-medium">
+                  <Link to="/insights" className="text-sm text-purple-300 hover:text-purple-200 font-medium">
                     View All →
                   </Link>
                 </div>
@@ -329,7 +349,7 @@ export default function Dashboard() {
         </div>
 
             {/* Top Categories - Quick Insight */}
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 shadow-lg">
+            <div className="bg-gradient-to-br from-cyan-600/10 to-blue-600/10 rounded-lg border border-cyan-500/30 p-5 shadow-lg">
               <h3 className="text-lg font-semibold text-white mb-4">Top Categories</h3>
               {topCategories.length > 0 ? (
                 <div className="space-y-4">
@@ -374,118 +394,140 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Recent Transactions - Limited List */}
-          <div className="bg-gray-800 rounded-lg border border-gray-700 shadow-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-white">Recent Transactions</h3>
-              <Link 
-                to="/insights" 
-                className="text-sm text-indigo-400 hover:text-indigo-300 font-medium"
-              >
-                View All →
-              </Link>
-            </div>
-            
-            {recentExpenses.length > 0 ? (
-              <div className="divide-y divide-gray-700">
-                {recentExpenses.map((expense) => {
-                  const categoryColors = {
-                    Food: 'bg-orange-500/20 text-orange-300 border border-orange-500/30',
-                    Transport: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
-                    Shopping: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
-                    Bills: 'bg-red-500/20 text-red-300 border border-red-500/30',
-                    Entertainment: 'bg-pink-500/20 text-pink-300 border border-pink-500/30',
-                    Health: 'bg-green-500/20 text-green-300 border border-green-500/30',
-                    Other: 'bg-gray-500/20 text-gray-300 border border-gray-500/30'
-                  };
+          {/* Expense Filters & List - Minimal */}
+          {expenses.length > 0 && (
+            <div className="mt-4">
+              <div className="relative bg-gradient-to-br from-gray-800/90 via-indigo-900/20 to-purple-900/20 backdrop-blur-sm rounded-xl border border-indigo-500/20 shadow-2xl overflow-hidden">
+                {/* Enhanced Background Pattern */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.04)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl"></div>
+                
+                <div className="relative z-10">
+                  {/* Filters Section - Compact */}
+                  <div className="px-4 py-3.5 border-b border-indigo-500/20 bg-gradient-to-r from-indigo-900/10 to-purple-900/10 backdrop-blur-sm">
+                    <ExpenseFilters onFilterChange={handleFilterChange} />
+                  </div>
                   
-                  const categoryIcons = {
-                    Food: '🍔',
-                    Transport: '🚗',
-                    Shopping: '🛍️',
-                    Bills: '💳',
-                    Entertainment: '🎬',
-                    Health: '💊',
-                    Other: '📦'
-                  };
-
-                  return (
-                    <div 
-                      key={expense.id}
-                      className="p-4 hover:bg-gray-700/50 transition-colors cursor-pointer"
-                      onClick={() => handleEdit(expense)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg ${categoryColors[expense.category] || categoryColors.Other}`}>
-                            {categoryIcons[expense.category] || '📦'}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-white truncate">{expense.description}</p>
-                            <p className="text-xs text-gray-400">
-                              {new Date(expense.date).toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric',
-                                year: expense.date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-                              })}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg font-bold text-white">₹{expense.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(expense.id);
-                            }}
-                            className="p-1.5 text-red-400 hover:bg-red-500/20 rounded transition-colors"
-                            title="Delete"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
+                  {/* Expense List Section - Minimal */}
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-base font-semibold text-white">Recent Expenses</h3>
+                      <span className="text-xs text-indigo-300 bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-500/20">{filteredExpenses.length} total</span>
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="p-12 text-center">
-                <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <p className="text-gray-300 font-medium mb-2">No transactions yet</p>
-                <p className="text-sm text-gray-400 mb-4">Start tracking your expenses</p>
-                <button
-                  onClick={() => setShowFormModal(true)}
-                  className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg"
-                >
-                  Add Your First Expense
-                </button>
-          </div>
-        )}
-          </div>
+                  
+                  {filteredExpenses.length > 0 ? (
+                    <>
+                      <div className="space-y-2">
+                        {filteredExpenses.slice(0, showAllExpenses ? filteredExpenses.length : 4).map((expense) => {
+                          const categoryConfig = {
+                            Food: { icon: '🍔', color: 'text-orange-400' },
+                            Transport: { icon: '🚗', color: 'text-blue-400' },
+                            Shopping: { icon: '🛍️', color: 'text-purple-400' },
+                            Bills: { icon: '💳', color: 'text-red-400' },
+                            Entertainment: { icon: '🎬', color: 'text-pink-400' },
+                            Health: { icon: '💊', color: 'text-green-400' },
+                            Other: { icon: '📦', color: 'text-gray-400' }
+                          };
+                          
+                          const config = categoryConfig[expense.category] || categoryConfig.Other;
 
-          {/* Filters - Only shown when there are expenses */}
-          {expenses.length > 5 && (
-            <div className="mt-6">
-              <ExpenseFilters onFilterChange={handleFilterChange} />
-              <div className="mt-4">
-            <ExpenseList
-                  expenses={filteredExpenses}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          </div>
+                          return (
+                            <div 
+                              key={expense.id}
+                              className="relative bg-gradient-to-r from-gray-800/60 via-gray-800/40 to-gray-800/60 border border-indigo-500/20 rounded-lg p-3 hover:bg-gradient-to-r hover:from-indigo-900/30 hover:via-purple-900/20 hover:to-indigo-900/30 hover:border-indigo-500/40 hover:shadow-lg transition-all duration-200 cursor-pointer group backdrop-blur-sm"
+                              onClick={() => handleEdit(expense)}
+                            >
+                              {/* Subtle glow effect on hover */}
+                              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-purple-500/0 to-indigo-500/0 rounded-lg opacity-0 group-hover:opacity-10 transition-opacity duration-200"></div>
+                              <div className="relative z-10">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  <span className={`text-lg ${config.color}`}>{config.icon}</span>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-white truncate">{expense.description}</p>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                      <span className="text-xs text-gray-400">{expense.category}</span>
+                                      <span className="text-xs text-gray-500">•</span>
+                                      <span className="text-xs text-gray-400">
+                                        {new Date(expense.date).toLocaleDateString('en-US', { 
+                                          month: 'short', 
+                                          day: 'numeric'
+                                        })}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-3 ml-3">
+                                  <span className="text-base font-bold text-white">
+                                    ₹{expense.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+                                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEdit(expense);
+                                      }}
+                                      className="p-1.5 text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded transition-all"
+                                      title="Edit"
+                                    >
+                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                      </svg>
+                                    </button>
+              <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(expense.id);
+                                      }}
+                                      className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-all"
+                                      title="Delete"
+                                    >
+                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
+              </button>
+                                  </div>
+                                </div>
+                              </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {filteredExpenses.length > 4 && !showAllExpenses && (
+                        <button
+                          onClick={() => setShowAllExpenses(true)}
+                          className="w-full mt-3 py-2.5 text-sm font-medium text-indigo-300 hover:text-white bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 rounded-lg hover:from-indigo-600/30 hover:to-purple-600/30 hover:border-indigo-500/50 transition-all shadow-lg hover:shadow-indigo-500/20"
+                        >
+                          View All {filteredExpenses.length} Expenses →
+                        </button>
+                      )}
+                      
+                      {showAllExpenses && filteredExpenses.length > 4 && (
+                        <button
+                          onClick={() => setShowAllExpenses(false)}
+                          className="w-full mt-3 py-2.5 text-sm font-medium text-gray-400 hover:text-gray-300 border border-gray-600/50 rounded-lg hover:bg-gray-700/50 transition-all"
+                        >
+                          Show Less
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-gray-400">No expenses found</p>
+                    </div>
+                  )}
+                </div>
+                </div>
+              </div>
             </div>
           )}
           </div>
         </main>
-      </div>
+        </div>
 
       {/* Guided Tour */}
       <GuidedTour />
@@ -502,12 +544,13 @@ export default function Dashboard() {
         onClose={handleCancel}
         title={editingExpense ? 'Edit Expense' : 'Add New Expense'}
       >
-        <ExpenseForm
-          expense={editingExpense}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-        />
+            <ExpenseForm
+              expense={editingExpense}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+            />
       </Modal>
     </div>
   );
 }
+

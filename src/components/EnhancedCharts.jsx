@@ -80,11 +80,11 @@ export default function EnhancedCharts({ expenses }) {
 
   if (expenses.length === 0) {
     return (
-      <div className="bg-white p-6 rounded-xl border border-gray-200 text-center">
-        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+      <div className="bg-gray-800/80 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50 text-center">
+        <div className="w-12 h-12 bg-gray-700/50 rounded-lg flex items-center justify-center mx-auto mb-3">
           <span className="text-2xl">📊</span>
         </div>
-        <p className="text-gray-600 text-sm">Add expenses to see analytics</p>
+        <p className="text-gray-300 text-sm">Add expenses to see analytics</p>
       </div>
     );
   }
@@ -93,21 +93,21 @@ export default function EnhancedCharts({ expenses }) {
     const isExpanded = expandedChart === chartType;
     
     return (
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-700/50 overflow-hidden">
         <div 
-          className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-700/30 transition-colors"
           onClick={() => setExpandedChart(isExpanded ? null : chartType)}
         >
           <div className="flex items-center gap-2">
             <span className="text-xl">{icon}</span>
-            <h3 className="text-base font-semibold text-gray-800">{title}</h3>
+            <h3 className="text-base font-semibold text-white">{title}</h3>
           </div>
-          <button className="text-gray-400 hover:text-gray-600">
+          <button className="text-gray-400 hover:text-gray-300">
             {isExpanded ? '−' : '+'}
           </button>
         </div>
         {isExpanded && (
-          <div className="p-4 border-t border-gray-100">
+          <div className="p-4 border-t border-gray-700/50">
             {children}
           </div>
         )}
@@ -138,11 +138,12 @@ export default function EnhancedCharts({ expenses }) {
             <Tooltip 
               formatter={(value) => `₹${value.toFixed(2)}`}
               contentStyle={{
-                backgroundColor: '#fff',
-                border: '1px solid #e5e7eb',
+                backgroundColor: '#1f2937',
+                border: '1px solid #374151',
                 borderRadius: '8px',
                 padding: '8px 12px',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+                color: '#f3f4f6'
               }}
             />
           </PieChart>
@@ -154,23 +155,24 @@ export default function EnhancedCharts({ expenses }) {
         <ChartSection title="Monthly Spending Trend" icon="📈" chartType="line">
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis 
                 dataKey="month" 
-                stroke="#6b7280"
+                stroke="#9ca3af"
                 style={{ fontSize: '11px' }}
               />
               <YAxis 
-                stroke="#6b7280"
+                stroke="#9ca3af"
                 style={{ fontSize: '11px' }}
               />
               <Tooltip 
                 formatter={(value) => `₹${value.toFixed(2)}`}
                 contentStyle={{
-                  backgroundColor: '#fff',
-                  border: '1px solid #e5e7eb',
+                  backgroundColor: '#1f2937',
+                  border: '1px solid #374151',
                   borderRadius: '8px',
-                  padding: '8px 12px'
+                  padding: '8px 12px',
+                  color: '#f3f4f6'
                 }}
               />
               <Area 
@@ -198,26 +200,27 @@ export default function EnhancedCharts({ expenses }) {
         <ChartSection title="Daily Expenses (Last 30 Days)" icon="📅" chartType="bar">
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={dailyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis 
                 dataKey="date" 
-                stroke="#6b7280"
+                stroke="#9ca3af"
                 style={{ fontSize: '11px' }}
                 angle={-45}
                 textAnchor="end"
                 height={60}
               />
               <YAxis 
-                stroke="#6b7280"
+                stroke="#9ca3af"
                 style={{ fontSize: '11px' }}
               />
               <Tooltip 
                 formatter={(value) => `₹${value.toFixed(2)}`}
                 contentStyle={{
-                  backgroundColor: '#fff',
-                  border: '1px solid #e5e7eb',
+                  backgroundColor: '#1f2937',
+                  border: '1px solid #374151',
                   borderRadius: '8px',
-                  padding: '8px 12px'
+                  padding: '8px 12px',
+                  color: '#f3f4f6'
                 }}
               />
               <Bar 
@@ -231,19 +234,19 @@ export default function EnhancedCharts({ expenses }) {
       )}
 
       {/* Summary Stats */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-700/50 p-4">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <p className="text-xs text-gray-600 mb-1">Total</p>
-            <p className="text-lg font-bold text-gray-800">₹{totalExpenses.toFixed(2)}</p>
+            <p className="text-xs text-gray-400 mb-1">Total</p>
+            <p className="text-lg font-bold text-white">₹{totalExpenses.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-600 mb-1">Transactions</p>
-            <p className="text-lg font-bold text-gray-800">{expenses.length}</p>
+            <p className="text-xs text-gray-400 mb-1">Transactions</p>
+            <p className="text-lg font-bold text-white">{expenses.length}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-600 mb-1">Avg. Transaction</p>
-            <p className="text-lg font-bold text-gray-800">
+            <p className="text-xs text-gray-400 mb-1">Avg. Transaction</p>
+            <p className="text-lg font-bold text-white">
               ₹{expenses.length > 0 ? (totalExpenses / expenses.length).toFixed(2) : '0.00'}
             </p>
           </div>

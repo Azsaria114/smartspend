@@ -60,7 +60,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }) {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
             Description
           </label>
           <input
@@ -68,14 +68,14 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }) {
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             required
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-150"
+            className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-150"
             placeholder="e.g., Coffee, Groceries, Uber..."
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">
               Amount (₹)
             </label>
             <input
@@ -85,19 +85,19 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }) {
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
               required
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-150"
+              className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-150"
               placeholder="0.00"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">
               Category
             </label>
             <select
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 bg-white cursor-pointer"
+              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 cursor-pointer"
             >
               <option value="Food">🍔 Food</option>
               <option value="Transport">🚗 Transport</option>
@@ -111,7 +111,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }) {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
             Date
           </label>
           <input
@@ -119,7 +119,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }) {
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
             required
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-150"
+            className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-150"
           />
         </div>
 
@@ -134,7 +134,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }) {
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors font-semibold text-sm"
+              className="px-4 bg-gray-700 text-gray-300 py-3 rounded-lg hover:bg-gray-600 transition-colors font-semibold text-sm border border-gray-600"
             >
               Cancel
             </button>

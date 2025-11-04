@@ -94,14 +94,34 @@ export default function Insights() {
   const last7DaysTotal = last7Days.reduce((sum, e) => sum + e.amount, 0);
 
   return (
-    <div className="min-h-screen bg-gray-900 flex">
-      {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'block' : 'hidden'} lg:block fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 lg:h-screen`}>
-        <Sidebar onClose={() => setSidebarOpen(false)} />
+    <div className="min-h-screen bg-gray-900 flex relative overflow-hidden">
+      {/* Enhanced Animated Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-indigo-900/30 to-purple-900/30">
+        {/* Animated gradient orbs */}
+        <div className="absolute top-0 -left-20 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 -right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+        
+        {/* Radial gradients */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(99,102,241,0.15),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(147,51,234,0.15),transparent_50%)]"></div>
+        
+        {/* Additional floating shapes for depth */}
+        <div className="absolute top-20 left-20 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-20 right-20 w-40 h-40 bg-purple-500/10 rounded-full blur-2xl"></div>
+        <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl"></div>
       </div>
 
+          {/* Sidebar */}
+          <div className={`${sidebarOpen ? 'block' : 'hidden'} lg:block fixed inset-y-0 left-0 z-40 lg:h-screen`}>
+            <Sidebar onClose={() => setSidebarOpen(false)} onLogout={handleLogout} />
+          </div>
+
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 relative z-10 lg:ml-64 xl:ml-72">
         {/* Mobile Menu Button */}
         <div className="lg:hidden fixed top-4 left-4 z-50">
           <button
@@ -114,40 +134,44 @@ export default function Insights() {
           </button>
         </div>
 
-        {/* Unified Header */}
-        <Header
-          showNotifications={false}
-          showAddExpense={false}
-          onLogout={handleLogout}
-        />
+        {/* Unified Header - Fixed Sticky */}
+        <div className="fixed top-0 left-0 right-0 z-30 lg:left-64 xl:left-72">
+          <Header
+            showNotifications={false}
+            showAddExpense={false}
+          />
+        </div>
+
+        {/* Spacer for fixed header */}
+        <div className="h-16"></div>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto bg-gray-900">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           {/* Key Stats */}
           {expenses.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 shadow-lg">
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Total Expenses</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              <div className="bg-gradient-to-br from-indigo-600/20 to-indigo-800/20 rounded-lg border border-indigo-500/30 p-4 shadow-lg">
+                <p className="text-xs font-medium text-indigo-300 uppercase tracking-wide mb-1">Total Expenses</p>
                 <p className="text-2xl font-bold text-white">₹{totalSpent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 shadow-lg">
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">This Month</p>
+              <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-lg border border-purple-500/30 p-4 shadow-lg">
+                <p className="text-xs font-medium text-purple-300 uppercase tracking-wide mb-1">This Month</p>
                 <p className="text-2xl font-bold text-white">₹{thisMonthTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 shadow-lg">
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Last 7 Days</p>
+              <div className="bg-gradient-to-br from-pink-600/20 to-pink-800/20 rounded-lg border border-pink-500/30 p-4 shadow-lg">
+                <p className="text-xs font-medium text-pink-300 uppercase tracking-wide mb-1">Last 7 Days</p>
                 <p className="text-2xl font-bold text-white">₹{last7DaysTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 shadow-lg">
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Avg Transaction</p>
+              <div className="bg-gradient-to-br from-cyan-600/20 to-cyan-800/20 rounded-lg border border-cyan-500/30 p-4 shadow-lg">
+                <p className="text-xs font-medium text-cyan-300 uppercase tracking-wide mb-1">Avg Transaction</p>
                 <p className="text-2xl font-bold text-white">₹{avgExpense.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
             </div>
           )}
 
           {/* Tabs */}
-          <div className="bg-gray-800 rounded-lg p-1.5 mb-6 border border-gray-700 shadow-lg">
+          <div className="bg-gray-800 rounded-lg p-1.5 mb-4 border border-gray-700 shadow-lg">
             <div className="flex gap-1.5">
               <button
                 onClick={() => setActiveTab('insights')}
@@ -157,8 +181,8 @@ export default function Insights() {
                     ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/50'
                     : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                 }`}
-              >
-                Insights
+                >
+                  Insights
               </button>
               <button
                 onClick={() => setActiveTab('chat')}
@@ -183,14 +207,14 @@ export default function Insights() {
                 Budget Planner
               </button>
             </div>
-          </div>
+        </div>
 
-          {expensesLoading ? (
+        {expensesLoading ? (
             <div className="bg-gray-800 p-12 rounded-lg border border-gray-700 text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
               <div className="text-gray-300 font-medium">Loading expenses...</div>
-            </div>
-          ) : expenses.length === 0 ? (
+          </div>
+        ) : expenses.length === 0 ? (
             <div className="bg-gray-800 p-12 rounded-lg border border-gray-700 text-center">
               <div className="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,21 +222,21 @@ export default function Insights() {
                 </svg>
               </div>
               <p className="text-gray-300 font-medium mb-4">No expenses recorded yet.</p>
-              <Link
-                to="/dashboard"
+            <Link
+              to="/dashboard"
                 className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg"
-              >
-                Add your first expense to get AI insights →
-              </Link>
-            </div>
-          ) : (
+            >
+              Add your first expense to get AI insights →
+            </Link>
+          </div>
+        ) : (
             <>
               {activeTab === 'insights' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   {/* Sidebar Stats */}
-                  <div className="lg:col-span-1 space-y-4">
-                    <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 shadow-lg">
-                      <div className="flex items-center gap-3 mb-4">
+                  <div className="lg:col-span-1 space-y-3">
+                    <div className="bg-gradient-to-br from-indigo-600/10 to-purple-600/10 rounded-lg border border-indigo-500/30 p-4 shadow-lg">
+                      <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -220,30 +244,30 @@ export default function Insights() {
                         </div>
                         <h3 className="text-lg font-semibold text-white">Summary</h3>
                       </div>
-                      <div className="space-y-3">
+                <div className="space-y-3">
                         <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
                           <p className="text-xs text-gray-400 mb-1">Total Expenses</p>
                           <p className="text-2xl font-bold text-white">
                             ₹{totalSpent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </p>
-                        </div>
+                  </div>
                         <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
                           <p className="text-xs text-gray-400 mb-1">Transactions</p>
                           <p className="text-xl font-bold text-white">{expenses.length}</p>
-                        </div>
-                      </div>
-                    </div>
+                  </div>
+                </div>
+              </div>
 
-                    <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 shadow-lg">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                          </svg>
-                        </div>
-                        <h3 className="text-lg font-semibold text-white">Top Categories</h3>
-                      </div>
-                      <div className="space-y-2">
+                        <div className="bg-gradient-to-br from-pink-600/10 to-fuchsia-600/10 rounded-lg border border-pink-500/30 p-4 shadow-lg">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                              </svg>
+                            </div>
+                            <h3 className="text-lg font-semibold text-white">Top Categories</h3>
+                          </div>
+                <div className="space-y-2">
                         {topCategories.map(([category, amount], index) => (
                           <div 
                             key={category}
@@ -256,14 +280,14 @@ export default function Insights() {
                               <span className="font-medium text-white text-sm">{category}</span>
                             </div>
                             <span className="font-bold text-white text-sm">₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                          </div>
-                        ))}
-                      </div>
                     </div>
+                  ))}
+                </div>
+              </div>
 
-                    <button
-                      onClick={fetchAdvice}
-                      disabled={loading}
+              <button
+                onClick={fetchAdvice}
+                disabled={loading}
                       className="w-full px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center justify-center gap-2"
                     >
                       {loading ? (
@@ -279,11 +303,11 @@ export default function Insights() {
                           <span>Refresh Insights</span>
                         </>
                       )}
-                    </button>
-                  </div>
+              </button>
+            </div>
 
                   {/* AI Advice - Story Format Design */}
-                  <div className="lg:col-span-2">
+            <div className="lg:col-span-2">
                     <div className="bg-gray-800 rounded-lg border border-gray-700 shadow-lg overflow-hidden">
                       {/* Compact Header */}
                       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-4 border-b border-indigo-500/20">
@@ -298,18 +322,18 @@ export default function Insights() {
                             <p className="text-indigo-100 text-xs mt-0.5">Personalized insights & recommendations</p>
                           </div>
                         </div>
-                      </div>
+                </div>
 
                       {/* Story Content */}
                       <div className="p-5 bg-gray-800">
-                        {loading ? (
+                {loading ? (
                           <div className="space-y-3">
                             <div className="h-3 bg-gray-700 rounded w-full animate-pulse"></div>
                             <div className="h-3 bg-gray-700 rounded w-5/6 animate-pulse"></div>
                             <div className="h-3 bg-gray-700 rounded w-4/6 animate-pulse"></div>
                             <div className="h-3 bg-gray-700 rounded w-full mt-4 animate-pulse"></div>
-                          </div>
-                        ) : error ? (
+                  </div>
+                ) : error ? (
                           <div className="bg-red-900/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
                               <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -324,17 +348,17 @@ export default function Insights() {
                             >
                               Try Again
                             </button>
-                          </div>
-                        ) : advice ? (
+                  </div>
+                ) : advice ? (
                           <div className="relative">
                             {/* Story Timeline */}
                             <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-500 via-purple-500 to-transparent"></div>
                             
                             <div className="pl-6 space-y-4">
                               <FormattedAdvice advice={advice} />
-                            </div>
-                          </div>
-                        ) : (
+                    </div>
+                  </div>
+                ) : (
                           <div className="text-center py-12">
                             <div className="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-4 border border-indigo-500/30">
                               <svg className="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -346,9 +370,9 @@ export default function Insights() {
                           </div>
                         )}
                       </div>
-                    </div>
+              </div>
 
-                    {/* API Setup Info */}
+              {/* API Setup Info */}
                     {(!import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY === 'your-gemini-api-key-here') && (
                       <div className="bg-blue-900/30 border border-blue-500/50 p-5 rounded-lg mt-4">
                         <div className="flex items-start gap-3">
@@ -359,11 +383,11 @@ export default function Insights() {
                             <p className="font-semibold text-blue-300 mb-2 text-sm">Enable Real AI Insights</p>
                             <p className="text-xs text-blue-400 leading-relaxed">
                               Add your Gemini API key to the <code className="bg-blue-900/50 px-1.5 py-0.5 rounded font-mono text-xs text-blue-200">.env</code> file as <code className="bg-blue-900/50 px-1.5 py-0.5 rounded font-mono text-xs text-blue-200">VITE_GEMINI_API_KEY</code> for personalized AI-powered financial advice.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
                   </div>
                 </div>
               )}

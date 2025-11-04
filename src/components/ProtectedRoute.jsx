@@ -26,9 +26,9 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
-  // If not authenticated, redirect to login
+  // If not authenticated, redirect to home
   if (!currentUser) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // Check onboarding completion - be more lenient for better UX

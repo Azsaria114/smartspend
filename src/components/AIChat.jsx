@@ -76,7 +76,10 @@ export default function AIChat({ expenses, onClose }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 overflow-hidden">
+    <div className="flex flex-col h-full bg-gray-800 rounded-lg border border-gray-700 overflow-hidden relative">
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
+      <div className="flex flex-col h-full relative z-10">
       {/* Header */}
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 flex items-center justify-between border-b border-indigo-700">
         <div className="flex items-center gap-4">
@@ -187,6 +190,7 @@ export default function AIChat({ expenses, onClose }) {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }
